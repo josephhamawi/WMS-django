@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issuance Details - Warehouse Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+        }
+        .navbar-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .navbar-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .detail-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .info-value {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            background-color: white;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        .badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .badge-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .badge-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .back-link {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .back-link:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <h1>Warehouse Management System</h1>
+            <div class="navbar-links">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'inventory_dashboard' %}" style="background-color: rgba(255, 255, 255, 0.2);">Inventory</a>
+                {% if user.is_superuser %}
+                <a href="{% url 'procurement_dashboard' %}">Procurement</a>
+                <a href="/admin/">Admin</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <span style="color: white; padding: 8px 16px;">{{ user.username }}</span>
+                <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Issuance Details: {{ issuance.issue_number }}</h2>
+
+        <div class="detail-section">
+            <h3>Issuance Information</h3>
+            <div class="info-grid">
+                <div class="info-label">Issue Number:</div>
+                <div class="info-value"><strong>{{ issuance.issue_number }}</strong></div>
+
+                <div class="info-label">Request Number:</div>
+                <div class="info-value">
+                    <a href="{% url 'request_detail' issuance.item_request.id %}" style="color: #007bff;">
+                        {{ issuance.item_request.request_number }}
+                    </a>
+                </div>
+
+                <div class="info-label">Issued By:</div>
+                <div class="info-value">{{ issuance.issued_by.get_full_name|default:issuance.issued_by.username }}</div>
+
+                <div class="info-label">Issued To:</div>
+                <div class="info-value">{{ issuance.issued_to.get_full_name|default:issuance.issued_to.username }}</div>
+
+                <div class="info-label">Issued Date:</div>
+                <div class="info-value">{{ issuance.issued_date|date:"Y-m-d H:i" }}</div>
+
+                <div class="info-label">Status:</div>
+                <div class="info-value">
+                    {% if issuance.status == 'completed' %}
+                    <span class="badge badge-completed">Completed</span>
+                    {% elif issuance.status == 'pending' %}
+                    <span class="badge badge-pending">Pending</span>
+                    {% else %}
+                    <span class="badge badge-cancelled">{{ issuance.status|title }}</span>
+                    {% endif %}
+                </div>
+
+                {% if issuance.notes %}
+                <div class="info-label">Notes:</div>
+                <div class="info-value">{{ issuance.notes }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Issued Items</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th>UoM</th>
+                        <th>Quantity Issued</th>
+                        <th>Destination Site</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for line in issuance.lines.all %}
+                    <tr>
+                        <td>{{ line.request_line.product.name }}</td>
+                        <td>{{ line.request_line.product.sku|default:"-" }}</td>
+                        <td>{% if line.request_line.product.unit_of_measure %}{{ line.request_line.product.unit_of_measure.abbreviation }}{% else %}-{% endif %}</td>
+                        <td><strong>{{ line.quantity_issued }}</strong></td>
+                        <td>{{ line.request_line.destination_site.name|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <a href="{% url 'issuance_list' %}" class="back-link">Back to Issuance List</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Issuance - Warehouse Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+        }
+        .navbar-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .navbar-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-section {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+        select, input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        table {
+            width: 100%;
+            background-color: white;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        .quantity-input {
+            width: 100px;
+            padding: 5px;
+        }
+        .info-box {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .info-box strong {
+            color: #0056b3;
+        }
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 12px 30px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .back-link {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .back-link:hover {
+            background-color: #5a6268;
+        }
+        #items-table-container {
+            display: none;
+        }
+        .warning-text {
+            color: #dc3545;
+            font-size: 12px;
+        }
+        .success-text {
+            color: #28a745;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <h1>Warehouse Management System</h1>
+            <div class="navbar-links">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'inventory_dashboard' %}" style="background-color: rgba(255, 255, 255, 0.2);">Inventory</a>
+                {% if user.is_superuser %}
+                <a href="{% url 'procurement_dashboard' %}">Procurement</a>
+                <a href="/admin/">Admin</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <span style="color: white; padding: 8px 16px;">{{ user.username }}</span>
+                <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Create New Issuance</h2>
+
+        <form method="POST" id="issuance-form">
+            {% csrf_token %}
+
+            <div class="form-section">
+                <label for="request_id">Select Request:</label>
+                <select id="request_id" name="request_id" required onchange="loadRequestItems()">
+                    <option value="">-- Select an Approved Request --</option>
+                    {% for req in approved_requests %}
+                    <option value="{{ req.id }}">{{ req.request_number }} - {{ req.requested_by.get_full_name|default:req.requested_by.username }} ({{ req.department.name|default:"No Dept" }})</option>
+                    {% endfor %}
+                </select>
+
+                <div id="request-info" class="info-box" style="display:none; margin-top: 20px;">
+                    <strong>Request Number:</strong> <span id="info-request-number"></span><br>
+                    <strong>Requested By:</strong> <span id="info-requested-by"></span><br>
+                    <strong>Department:</strong> <span id="info-department"></span>
+                </div>
+            </div>
+
+            <div id="items-table-container">
+                <div class="form-section">
+                    <h3>Request Items</h3>
+                    <p style="color: #666; margin-top: 10px;">Enter the quantity to issue for each item. Leave blank or enter 0 to skip an item.</p>
+
+                    <table id="items-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>SKU</th>
+                                <th>UoM</th>
+                                <th>Requested</th>
+                                <th>Approved</th>
+                                <th>Already Issued</th>
+                                <th>Remaining</th>
+                                <th>Stock Available</th>
+                                <th>Issue Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody id="items-tbody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="form-section">
+                    <label for="notes">Notes (optional):</label>
+                    <textarea id="notes" name="notes" placeholder="Any notes about this issuance..."></textarea>
+
+                    <div class="button-group">
+                        <button type="submit">Create Issuance</button>
+                        <a href="{% url 'issuance_list' %}" class="back-link">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function loadRequestItems() {
+            const requestId = document.getElementById('request_id').value;
+
+            if (!requestId) {
+                document.getElementById('items-table-container').style.display = 'none';
+                document.getElementById('request-info').style.display = 'none';
+                return;
+            }
+
+            // Fetch request items via AJAX
+            fetch(`/inventory/issuance/request-items/${requestId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update request info
+                    document.getElementById('info-request-number').textContent = data.request_number;
+                    document.getElementById('info-requested-by').textContent = data.requested_by;
+                    document.getElementById('info-department').textContent = data.department;
+                    document.getElementById('request-info').style.display = 'block';
+
+                    // Populate items table
+                    const tbody = document.getElementById('items-tbody');
+                    tbody.innerHTML = '';
+
+                    data.items.forEach(item => {
+                        const row = document.createElement('tr');
+
+                        // Check if item can be issued
+                        const canIssue = item.quantity_remaining > 0 && item.stock_available > 0;
+                        const maxQty = Math.min(item.quantity_remaining, item.stock_available);
+
+                        let stockStatus = '';
+                        if (item.quantity_remaining === 0) {
+                            stockStatus = '<span class="success-text">Fully Issued</span>';
+                        } else if (item.stock_available === 0) {
+                            stockStatus = '<span class="warning-text">Out of Stock</span>';
+                        } else if (item.stock_available < item.quantity_remaining) {
+                            stockStatus = '<span class="warning-text">Insufficient Stock</span>';
+                        }
+
+                        row.innerHTML = `
+                            <td>${item.product_name}</td>
+                            <td>${item.product_sku}</td>
+                            <td>${item.uom}</td>
+                            <td>${item.quantity_requested}</td>
+                            <td>${item.quantity_approved}</td>
+                            <td>${item.quantity_issued}</td>
+                            <td><strong>${item.quantity_remaining}</strong></td>
+                            <td>${item.stock_available} ${stockStatus}</td>
+                            <td>
+                                ${canIssue ?
+                                    `<input type="number" name="quantity_${item.id}" class="quantity-input" min="0" max="${maxQty}" placeholder="0">` :
+                                    '<input type="number" class="quantity-input" disabled placeholder="0">'
+                                }
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    document.getElementById('items-table-container').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error loading request items:', error);
+                    alert('Error loading request items. Please try again.');
+                });
+        }
+    </script>
+</body>
+</html>

@@ -182,13 +182,10 @@
         <div class="navbar-content">
             <h1>Warehouse Management System</h1>
             <div class="navbar-links">
-                <a href="{% url 'dashboard' %}">Dashboard</a>
-                <a href="{% url 'inventory_list' %}">Inventory</a>
-                <a href="{% url 'request_list' %}">Requests</a>
+                <a href="{% url 'dashboard' %}" style="background-color: rgba(255, 255, 255, 0.2);">Dashboard</a>
+                <a href="{% url 'inventory_dashboard' %}">Inventory</a>
                 {% if user.is_superuser %}
                 <a href="{% url 'procurement_dashboard' %}">Procurement</a>
-                {% endif %}
-                {% if user.is_superuser %}
                 <a href="/admin/">Admin</a>
                 {% endif %}
                 {% if user.is_authenticated %}
@@ -257,53 +254,65 @@
         <!-- Module Cards -->
         <div class="section-title">Quick Access</div>
         <div class="modules-grid">
-            <a href="{% url 'inventory_list' %}" class="module-card">
+            <a href="{% url 'inventory_dashboard' %}" class="module-card">
                 <div class="module-header">
-                    <h2>Inventory Management</h2>
-                    <p>Manage products and stock levels</p>
+                    <h2>Inventory & Warehouse Operations</h2>
+                    <p>Manage inventory, requests, and issuances</p>
                 </div>
                 <div class="module-body">
                     <div class="module-actions">
                         <div class="module-action">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                             </svg>
-                            <span>View all products</span>
+                            <span>Products & Stock</span>
                         </div>
                         <div class="module-action">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
-                            <span>Add new product</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-
-            <a href="{% url 'request_list' %}" class="module-card">
-                <div class="module-header">
-                    <h2>Item Requests</h2>
-                    <p>Request and approve items</p>
-                </div>
-                <div class="module-body">
-                    <div class="module-actions">
-                        <div class="module-action">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                            </svg>
-                            <span>View all requests</span>
+                            <span>Item Requests</span>
                         </div>
                         <div class="module-action">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                             </svg>
-                            <span>Create new request</span>
+                            <span>Item Issuances</span>
                         </div>
                     </div>
                 </div>
             </a>
 
             {% if user.is_superuser %}
+            <a href="{% url 'procurement_dashboard' %}" class="module-card">
+                <div class="module-header">
+                    <h2>Procurement</h2>
+                    <p>Manage vendors, POs, and quotations</p>
+                </div>
+                <div class="module-body">
+                    <div class="module-actions">
+                        <div class="module-action">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <span>Vendors</span>
+                        </div>
+                        <div class="module-action">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span>Purchase Orders</span>
+                        </div>
+                        <div class="module-action">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                            </svg>
+                            <span>Quotations</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
             <a href="/admin/" class="module-card">
                 <div class="module-header">
                     <h2>Admin Panel</h2>

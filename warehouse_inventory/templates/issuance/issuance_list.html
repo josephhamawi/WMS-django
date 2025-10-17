@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Inventory List</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issuance List - Warehouse Management System</title>
     <style>
         * {
             margin: 0;
@@ -86,13 +88,31 @@
         tr:hover {
             background-color: #f9f9f9;
         }
-        .edit-link {
+        .view-link {
             color: #007bff;
             text-decoration: none;
             font-weight: bold;
         }
-        .edit-link:hover {
+        .view-link:hover {
             text-decoration: underline;
+        }
+        .badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .badge-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .badge-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
         }
         .empty-message {
             text-align: center;
@@ -109,9 +129,13 @@
             <h1>Warehouse Management System</h1>
             <div class="navbar-links">
                 <a href="{% url 'dashboard' %}">Dashboard</a>
-                <a href="{% url 'inventory_dashboard' %}" style="background-color: rgba(255, 255, 255, 0.2);">Inventory</a>
+                <a href="{% url 'inventory_list' %}">Inventory</a>
+                <a href="{% url 'request_list' %}">Requests</a>
+                <a href="{% url 'issuance_list' %}" style="background-color: rgba(255, 255, 255, 0.2);">Issuances</a>
                 {% if user.is_superuser %}
                 <a href="{% url 'procurement_dashboard' %}">Procurement</a>
+                {% endif %}
+                {% if user.is_superuser %}
                 <a href="/admin/">Admin</a>
                 {% endif %}
                 {% if user.is_authenticated %}
@@ -126,44 +150,50 @@
     </nav>
 
     <div class="container">
-        <h2>Product Inventory</h2>
-        {% if can_manage_inventory %}
-        <a href="{% url 'add_inventory' %}" class="add-button">+ Add New Product</a>
+        <h2>Item Issuances</h2>
+        {% if can_create %}
+        <a href="{% url 'issuance_create' %}" class="add-button">+ Create New Issuance</a>
         {% endif %}
 
-    {% if products %}
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>SKU</th>
-            <th>Description</th>
-            <th>Quantity</th>
-            <th>UoM</th>
-            <th>Location</th>
-            {% if can_manage_inventory %}
-            <th>Actions</th>
-            {% endif %}
-        </tr>
-        {% for product in products %}
-        <tr>
-            <td><strong>{{ product.name }}</strong></td>
-            <td>{{ product.sku|default:"-" }}</td>
-            <td>{{ product.description }}</td>
-            <td>{{ product.quantity }}</td>
-            <td>{% if product.unit_of_measure %}{{ product.unit_of_measure.abbreviation }}{% else %}-{% endif %}</td>
-            <td>{{ product.location|default:"-" }}</td>
-            {% if can_manage_inventory %}
-            <td><a href="{% url 'update_inventory' product.id %}" class="edit-link">Edit</a></td>
-            {% endif %}
-        </tr>
-        {% endfor %}
-    </table>
-    {% else %}
-    <div class="empty-message">
-        <h2>No products in inventory</h2>
-        <p>Click "Add New Product" to get started.</p>
-    </div>
-    {% endif %}
+        {% if issuances %}
+        <table>
+            <tr>
+                <th>Issue Number</th>
+                <th>Request Number</th>
+                <th>Issued By</th>
+                <th>Issued To</th>
+                <th>Issued Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            {% for issuance in issuances %}
+            <tr>
+                <td><strong>{{ issuance.issue_number }}</strong></td>
+                <td>{{ issuance.item_request.request_number }}</td>
+                <td>{{ issuance.issued_by.get_full_name|default:issuance.issued_by.username }}</td>
+                <td>{{ issuance.issued_to.get_full_name|default:issuance.issued_to.username }}</td>
+                <td>{{ issuance.issued_date|date:"Y-m-d H:i" }}</td>
+                <td>
+                    {% if issuance.status == 'completed' %}
+                    <span class="badge badge-completed">Completed</span>
+                    {% elif issuance.status == 'pending' %}
+                    <span class="badge badge-pending">Pending</span>
+                    {% else %}
+                    <span class="badge badge-cancelled">{{ issuance.status|title }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'issuance_detail' issuance.id %}" class="view-link">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <div class="empty-message">
+            <h2>No issuances found</h2>
+            <p>Create a new issuance to get started.</p>
+        </div>
+        {% endif %}
     </div>
 </body>
 </html>

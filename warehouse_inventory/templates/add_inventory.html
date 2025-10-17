@@ -107,12 +107,9 @@
             <h1>Warehouse Management System</h1>
             <div class="navbar-links">
                 <a href="{% url 'dashboard' %}">Dashboard</a>
-                <a href="{% url 'inventory_list' %}" style="background-color: rgba(255, 255, 255, 0.2);">Inventory</a>
-                <a href="{% url 'request_list' %}">Requests</a>
+                <a href="{% url 'inventory_dashboard' %}" style="background-color: rgba(255, 255, 255, 0.2);">Inventory</a>
                 {% if user.is_superuser %}
                 <a href="{% url 'procurement_dashboard' %}">Procurement</a>
-                {% endif %}
-                {% if user.is_superuser %}
                 <a href="/admin/">Admin</a>
                 {% endif %}
                 {% if user.is_authenticated %}
@@ -132,6 +129,9 @@
         {% csrf_token %}
         <label for="name">Product Name:</label>
         <input type="text" id="name" name="name" required>
+
+        <label for="sku">SKU (Stock Keeping Unit):</label>
+        <input type="text" id="sku" name="sku" placeholder="e.g., PRD-001">
 
         <label for="description">Description:</label>
         <textarea id="description" name="description" required></textarea>

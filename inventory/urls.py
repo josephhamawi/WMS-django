@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views, request_views, auth_views, procurement_views
+from . import views, request_views, auth_views, procurement_views, issuance_views
 
 urlpatterns = [
     # Authentication
@@ -10,10 +10,13 @@ urlpatterns = [
     # Dashboard
     path('', views.dashboard, name='dashboard'),
 
+    # Inventory & Warehouse Operations Dashboard
+    path('inventory/', views.inventory_dashboard, name='inventory_dashboard'),
+
     # Inventory Management
-    path('inventory/', views.inventory_list, name='inventory_list'),
-    path('inventory/add/', views.add_inventory, name='add_inventory'),
-    path('inventory/update/<int:product_id>/', views.update_inventory, name='update_inventory'),
+    path('inventory/products/', views.inventory_list, name='inventory_list'),
+    path('inventory/products/add/', views.add_inventory, name='add_inventory'),
+    path('inventory/products/update/<int:product_id>/', views.update_inventory, name='update_inventory'),
 
     # Item Request Management
     path('requests/', request_views.request_list, name='request_list'),
@@ -29,4 +32,10 @@ urlpatterns = [
     path('procurement/vendors/', procurement_views.vendor_list, name='vendor_list'),
     path('procurement/po/', procurement_views.po_list, name='po_list'),
     path('procurement/quotations/', procurement_views.quotation_list, name='quotation_list'),
+
+    # Issuance Management
+    path('issuance/', issuance_views.issuance_list, name='issuance_list'),
+    path('issuance/create/', issuance_views.issuance_create, name='issuance_create'),
+    path('issuance/<int:issuance_id>/', issuance_views.issuance_detail, name='issuance_detail'),
+    path('issuance/request-items/<int:request_id>/', issuance_views.get_request_items, name='get_request_items'),
 ]

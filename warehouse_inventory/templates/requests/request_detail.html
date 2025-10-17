@@ -13,7 +13,6 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f5f5;
-            padding: 20px;
         }
         .container {
             max-width: 1400px;
@@ -357,9 +356,9 @@
             <h1 style="font-size: 24px; font-weight: 600;">Warehouse Management System</h1>
             <div class="navbar-links" style="display: flex; gap: 20px;">
                 <a href="{% url 'dashboard' %}" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px;">Dashboard</a>
-                <a href="{% url 'inventory_list' %}" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px;">Inventory</a>
-                <a href="{% url 'request_list' %}" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; background-color: rgba(255, 255, 255, 0.2);">Requests</a>
+                <a href="{% url 'inventory_dashboard' %}" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px; background-color: rgba(255, 255, 255, 0.2);">Inventory</a>
                 {% if user.is_superuser %}
+                <a href="{% url 'procurement_dashboard' %}" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px;">Procurement</a>
                 <a href="/admin/" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 4px;">Admin</a>
                 {% endif %}
                 {% if user.is_authenticated %}

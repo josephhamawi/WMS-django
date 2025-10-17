@@ -73,14 +73,14 @@
             align-items: center;
             justify-content: center;
         }
-        .stat-icon.purple {
+        .stat-icon.blue {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        .stat-icon.blue {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        .stat-icon.red {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
         }
-        .stat-icon.orange {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        .stat-icon.yellow {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
         }
         .stat-icon.green {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
@@ -205,19 +205,15 @@
             font-weight: 600;
             text-transform: uppercase;
         }
-        .status-draft {
-            background-color: #e2e3e5;
-            color: #383d41;
-        }
-        .status-submitted, .status-sent {
+        .status-pending {
             background-color: #fff3cd;
             color: #856404;
         }
-        .status-approved, .status-received {
+        .status-approved {
             background-color: #d4edda;
             color: #155724;
         }
-        .status-ordered {
+        .status-completed {
             background-color: #d1ecf1;
             color: #0c5460;
         }
@@ -229,9 +225,11 @@
             <h1>Warehouse Management System</h1>
             <div class="navbar-links">
                 <a href="{% url 'dashboard' %}">Dashboard</a>
-                <a href="{% url 'inventory_dashboard' %}">Inventory</a>
+                <a href="{% url 'inventory_dashboard' %}" style="background-color: rgba(255, 255, 255, 0.2);">Inventory</a>
                 {% if user.is_superuser %}
-                <a href="{% url 'procurement_dashboard' %}" style="background-color: rgba(255, 255, 255, 0.2);">Procurement</a>
+                <a href="{% url 'procurement_dashboard' %}">Procurement</a>
+                {% endif %}
+                {% if user.is_superuser %}
                 <a href="/admin/">Admin</a>
                 {% endif %}
                 {% if user.is_authenticated %}
@@ -251,50 +249,50 @@
         <!-- Statistics -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon purple">
+                <div class="stat-icon blue">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                     </svg>
                 </div>
                 <div class="stat-info">
-                    <h3>Active Vendors</h3>
-                    <p>{{ total_vendors }}</p>
+                    <h3>Total Products</h3>
+                    <p>{{ total_products }}</p>
                 </div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon blue">
+                <div class="stat-icon red">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <h3>Low Stock Items</h3>
+                    <p>{{ low_stock_count }}</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon yellow">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                 </div>
                 <div class="stat-info">
-                    <h3>Total Purchase Orders</h3>
-                    <p>{{ total_pos }}</p>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon orange">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <div class="stat-info">
-                    <h3>Pending POs</h3>
-                    <p>{{ pending_pos }}</p>
+                    <h3>Pending Requests</h3>
+                    <p>{{ pending_requests }}</p>
                 </div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-icon green">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                     </svg>
                 </div>
                 <div class="stat-info">
-                    <h3>Total Quotations</h3>
-                    <p>{{ total_quotations }}</p>
+                    <h3>Total Issuances</h3>
+                    <p>{{ total_issuances }}</p>
                 </div>
             </div>
         </div>
@@ -302,10 +300,10 @@
         <!-- Quick Access Modules -->
         <div class="section-title">Quick Access</div>
         <div class="modules-grid">
-            <a href="{% url 'vendor_list' %}" class="module-card">
+            <a href="{% url 'inventory_list' %}" class="module-card">
                 <div class="module-header">
-                    <h2>Vendors</h2>
-                    <p>Manage suppliers and pricing</p>
+                    <h2>Inventory</h2>
+                    <p>Manage products and stock levels</p>
                 </div>
                 <div class="module-body">
                     <div class="module-actions">
@@ -313,87 +311,91 @@
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                             </svg>
-                            <span>View all vendors</span>
+                            <span>View all products</span>
+                        </div>
+                        {% if can_manage_inventory %}
+                        <div class="module-action">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            <span>Add new product</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+
+            <a href="{% url 'request_list' %}" class="module-card">
+                <div class="module-header">
+                    <h2>Item Requests</h2>
+                    <p>Request and approve items</p>
+                </div>
+                <div class="module-body">
+                    <div class="module-actions">
+                        <div class="module-action">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            <span>View all requests</span>
                         </div>
                         <div class="module-action">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                             </svg>
-                            <span>Add new vendor</span>
+                            <span>Create new request</span>
                         </div>
                     </div>
                 </div>
             </a>
 
-            <a href="{% url 'po_list' %}" class="module-card">
+            <a href="{% url 'issuance_list' %}" class="module-card">
                 <div class="module-header">
-                    <h2>Purchase Orders</h2>
-                    <p>Create and manage POs</p>
+                    <h2>Item Issuances</h2>
+                    <p>Issue items to requests</p>
                 </div>
                 <div class="module-body">
                     <div class="module-actions">
                         <div class="module-action">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                             </svg>
-                            <span>View all POs</span>
+                            <span>View all issuances</span>
                         </div>
+                        {% if can_create_issuance %}
                         <div class="module-action">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                             </svg>
-                            <span>Create new PO</span>
+                            <span>Create new issuance</span>
                         </div>
-                    </div>
-                </div>
-            </a>
-
-            <a href="{% url 'quotation_list' %}" class="module-card">
-                <div class="module-header">
-                    <h2>Quotations</h2>
-                    <p>Request and compare quotes</p>
-                </div>
-                <div class="module-body">
-                    <div class="module-actions">
-                        <div class="module-action">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                            </svg>
-                            <span>View all quotations</span>
-                        </div>
-                        <div class="module-action">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                            </svg>
-                            <span>Request new quotation</span>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </a>
         </div>
 
-        <!-- Recent POs Table -->
-        {% if recent_pos %}
-        <div class="section-title">Recent Purchase Orders</div>
+        <!-- Recent Requests Table -->
+        {% if recent_requests %}
+        <div class="section-title">Recent Item Requests</div>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>PO Number</th>
-                        <th>Vendor</th>
+                        <th>Request #</th>
+                        <th>Requested By</th>
+                        <th>Department</th>
                         <th>Status</th>
-                        <th>Order Date</th>
-                        <th>Total Amount</th>
+                        <th>Request Date</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for po in recent_pos %}
+                    {% for req in recent_requests %}
                     <tr>
-                        <td><strong>{{ po.po_number }}</strong></td>
-                        <td>{{ po.display_vendor }}</td>
-                        <td><span class="status-badge status-{{ po.status }}">{{ po.get_status_display }}</span></td>
-                        <td>{{ po.order_date|date:"Y-m-d" }}</td>
-                        <td>${{ po.total_amount|floatformat:2 }}</td>
+                        <td><strong>{{ req.request_number }}</strong></td>
+                        <td>{{ req.requested_by.username }}</td>
+                        <td>{{ req.department.name|default:"-" }}</td>
+                        <td><span class="status-badge status-{{ req.status }}">{{ req.get_status_display }}</span></td>
+                        <td>{{ req.requested_date|date:"Y-m-d H:i" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -401,28 +403,28 @@
         </div>
         {% endif %}
 
-        <!-- Recent Quotations Table -->
-        {% if recent_quotations %}
-        <div class="section-title">Recent Quotations</div>
+        <!-- Recent Issuances Table -->
+        {% if recent_issuances %}
+        <div class="section-title">Recent Issuances</div>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Quotation Number</th>
-                        <th>Vendor</th>
-                        <th>Status</th>
-                        <th>Request Date</th>
-                        <th>Total Amount</th>
+                        <th>Issue #</th>
+                        <th>Request #</th>
+                        <th>Issued By</th>
+                        <th>Issued To</th>
+                        <th>Issue Date</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for quotation in recent_quotations %}
+                    {% for issuance in recent_issuances %}
                     <tr>
-                        <td><strong>{{ quotation.quotation_number }}</strong></td>
-                        <td>{{ quotation.vendor.name }}</td>
-                        <td><span class="status-badge status-{{ quotation.status }}">{{ quotation.get_status_display }}</span></td>
-                        <td>{{ quotation.request_date|date:"Y-m-d" }}</td>
-                        <td>{{ quotation.currency.symbol }}{{ quotation.total_amount|floatformat:2 }}</td>
+                        <td><strong>{{ issuance.issue_number }}</strong></td>
+                        <td>{{ issuance.item_request.request_number }}</td>
+                        <td>{{ issuance.issued_by.get_full_name|default:issuance.issued_by.username }}</td>
+                        <td>{{ issuance.issued_to.get_full_name|default:issuance.issued_to.username }}</td>
+                        <td>{{ issuance.issued_date|date:"Y-m-d H:i" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

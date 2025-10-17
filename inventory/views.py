@@ -36,6 +36,49 @@ def dashboard(request):
     return render(request, 'dashboard.html', context)
 
 
+@login_required
+def inventory_dashboard(request):
+    """Inventory & Warehouse Operations Dashboard"""
+    # Get statistics
+    total_products = Product.objects.count()
+    low_stock = [p for p in Product.objects.all() if p.is_low_stock]
+    low_stock_count = len(low_stock)
+
+    pending_requests = ItemRequest.objects.filter(status='pending').count()
+    approved_requests = ItemRequest.objects.filter(status='approved').count()
+    total_issuances = ItemIssuance.objects.count()
+    recent_issuances = ItemIssuance.objects.all().order_by('-issued_date')[:5]
+
+    # Recent requests
+    recent_requests = ItemRequest.objects.all().order_by('-created_at')[:5]
+
+    # Check permissions
+    can_manage_inventory = (
+        request.user.is_superuser or
+        request.user.groups.filter(name__in=['Warehouse Supervisor', 'Warehouse Manager']).exists()
+    )
+
+    can_create_issuance = (
+        request.user.is_superuser or
+        request.user.groups.filter(name__in=['Warehouse Supervisor', 'Warehouse Manager']).exists()
+    )
+
+    context = {
+        'page_title': 'Inventory & Warehouse Operations',
+        'total_products': total_products,
+        'low_stock_count': low_stock_count,
+        'low_stock_products': low_stock[:10],
+        'pending_requests': pending_requests,
+        'approved_requests': approved_requests,
+        'total_issuances': total_issuances,
+        'recent_requests': recent_requests,
+        'recent_issuances': recent_issuances,
+        'can_manage_inventory': can_manage_inventory,
+        'can_create_issuance': can_create_issuance,
+    }
+    return render(request, 'inventory/dashboard.html', context)
+
+
 # ==================== Inventory Management ====================
 
 @login_required
@@ -71,6 +114,7 @@ def add_inventory(request):
         try:
             # Get and validate form data
             name = request.POST.get('name', '').strip()
+            sku = request.POST.get('sku', '').strip()
             description = request.POST.get('description', '').strip()
             quantity = request.POST.get('quantity', '').strip()
             location_id = request.POST.get('location', '')
@@ -94,6 +138,7 @@ def add_inventory(request):
 
             product = Product(
                 name=name,
+                sku=sku if sku else None,
                 description=description,
                 quantity=quantity,
             )
@@ -138,6 +183,7 @@ def update_inventory(request, product_id):
         try:
             # Get and validate form data
             name = request.POST.get('name', '').strip()
+            sku = request.POST.get('sku', '').strip()
             description = request.POST.get('description', '').strip()
             quantity = request.POST.get('quantity', '').strip()
             location_id = request.POST.get('location', '')
@@ -158,6 +204,7 @@ def update_inventory(request, product_id):
 
             # Update product
             product.name = name
+            product.sku = sku if sku else None
             product.description = description
             product.quantity = quantity
 
