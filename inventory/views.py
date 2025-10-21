@@ -14,7 +14,7 @@ from .models import (
 )
 from .utils import (
     generate_po_number, generate_request_number,
-    generate_issue_number, generate_receiving_number
+    generate_issue_number, generate_receiving_number, generate_product_sku
 )
 
 
@@ -22,16 +22,25 @@ from .utils import (
 
 def dashboard(request):
     """Main dashboard with overview"""
-    low_stock = [p for p in Product.objects.all() if p.is_low_stock]
+    # Get all products for the inventory table
+    products = Product.objects.all().order_by('-id')
+    low_stock = [p for p in products if p.is_low_stock]
+
+    # Check if user has permission to add/edit inventory
+    can_manage_inventory = False
+    if request.user.is_authenticated:
+        can_manage_inventory = (
+            request.user.is_superuser or
+            request.user.groups.filter(name__in=['Warehouse Supervisor', 'Warehouse Manager']).exists()
+        )
 
     context = {
-        'total_products': Product.objects.count(),
+        'products': products,
+        'total_products': products.count(),
         'low_stock_count': len(low_stock),
-        'low_stock_products': low_stock[:10],
         'pending_requests': ItemRequest.objects.filter(status='pending').count(),
         'pending_pos': PurchaseOrder.objects.filter(status__in=['draft', 'submitted']).count(),
-        'recent_requests': ItemRequest.objects.all()[:5],
-        'recent_pos': PurchaseOrder.objects.all()[:5],
+        'can_manage_inventory': can_manage_inventory,
     }
     return render(request, 'dashboard.html', context)
 
@@ -45,12 +54,7 @@ def inventory_dashboard(request):
     low_stock_count = len(low_stock)
 
     pending_requests = ItemRequest.objects.filter(status='pending').count()
-    approved_requests = ItemRequest.objects.filter(status='approved').count()
     total_issuances = ItemIssuance.objects.count()
-    recent_issuances = ItemIssuance.objects.all().order_by('-issued_date')[:5]
-
-    # Recent requests
-    recent_requests = ItemRequest.objects.all().order_by('-created_at')[:5]
 
     # Check permissions
     can_manage_inventory = (
@@ -67,12 +71,8 @@ def inventory_dashboard(request):
         'page_title': 'Inventory & Warehouse Operations',
         'total_products': total_products,
         'low_stock_count': low_stock_count,
-        'low_stock_products': low_stock[:10],
         'pending_requests': pending_requests,
-        'approved_requests': approved_requests,
         'total_issuances': total_issuances,
-        'recent_requests': recent_requests,
-        'recent_issuances': recent_issuances,
         'can_manage_inventory': can_manage_inventory,
         'can_create_issuance': can_create_issuance,
     }
@@ -114,7 +114,6 @@ def add_inventory(request):
         try:
             # Get and validate form data
             name = request.POST.get('name', '').strip()
-            sku = request.POST.get('sku', '').strip()
             description = request.POST.get('description', '').strip()
             quantity = request.POST.get('quantity', '').strip()
             location_id = request.POST.get('location', '')
@@ -133,12 +132,15 @@ def add_inventory(request):
             except (ValueError, TypeError):
                 raise ValidationError('Quantity must be a valid number')
 
+            # Auto-generate SKU
+            sku = generate_product_sku()
+
             # Create product
             from .models import StorageLocation, UnitOfMeasure
 
             product = Product(
                 name=name,
-                sku=sku if sku else None,
+                sku=sku,
                 description=description,
                 quantity=quantity,
             )
@@ -149,7 +151,7 @@ def add_inventory(request):
                 product.unit_of_measure_id = unit_of_measure_id
 
             product.save()
-            messages.success(request, f'Product "{name}" added successfully!')
+            messages.success(request, f'Product "{name}" added successfully with SKU {sku}!')
             return redirect('inventory_list')
 
         except ValidationError as e:

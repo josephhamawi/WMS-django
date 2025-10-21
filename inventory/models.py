@@ -210,7 +210,8 @@ class PurchaseOrder(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
-    po_number = models.CharField(max_length=100, unique=True)
+    po_number = models.CharField(max_length=100, unique=True, help_text="Internal PO number (auto-generated)")
+    external_po_number = models.CharField(max_length=100, blank=True, help_text="External/Reference PO number from another system")
     vendor = models.ForeignKey(Vendor, on_delete=models.PROTECT, related_name='purchase_orders', null=True, blank=True)
     # Keep legacy fields for compatibility
     supplier_name = models.CharField(max_length=255, blank=True, help_text="Legacy field - use vendor instead")
@@ -450,3 +451,34 @@ class ItemIssuanceLine(models.Model):
 
     def __str__(self):
         return f"{self.request_line.product.name} - Issued: {self.quantity_issued}"
+
+
+# ==================== Transfer Management ====================
+
+class Transfer(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    transfer_number = models.CharField(max_length=100, unique=True, help_text="Transfer number (auto-generated)")
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='transfers')
+    quantity = models.IntegerField(help_text="Quantity to transfer")
+    from_location = models.ForeignKey(StorageLocation, on_delete=models.PROTECT, related_name='transfers_from', help_text="Source location")
+    to_location = models.ForeignKey(StorageLocation, on_delete=models.PROTECT, related_name='transfers_to', help_text="Destination location")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    requested_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='transfers_requested')
+    transferred_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='transfers_processed')
+    transfer_date = models.DateTimeField(null=True, blank=True, help_text="Date when transfer was completed")
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"TRF-{self.transfer_number} - {self.product.name} ({self.from_location.code} → {self.to_location.code})"
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Transfer"
+        verbose_name_plural = "Transfers"

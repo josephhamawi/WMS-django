@@ -121,6 +121,24 @@
             background-color: white;
             border-radius: 8px;
         }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .back-link {
+            display: inline-block;
+            padding: 10px 20px;
+            color: #667eea;
+            text-decoration: none;
+            border: 2px solid #667eea;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            background-color: #667eea;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -151,9 +169,13 @@
 
     <div class="container">
         <h2>Item Issuances</h2>
-        {% if can_create %}
-        <a href="{% url 'issuance_create' %}" class="add-button">+ Create New Issuance</a>
-        {% endif %}
+
+        <div class="button-group">
+            {% if can_create %}
+            <a href="{% url 'issuance_create' %}" class="add-button">+ Create New Issuance</a>
+            {% endif %}
+            <a href="{% url 'inventory_dashboard' %}" class="back-link">&larr; Back to Inventory Dashboard</a>
+        </div>
 
         {% if issuances %}
         <table>

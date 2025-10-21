@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} - WMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+        }
+        .navbar-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .navbar-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .detail-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+            padding: 12px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+        .info-value {
+            color: #333;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .transfer-flow {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .location-box {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background-color: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+        }
+        .location-code {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        .location-name {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .arrow {
+            font-size: 30px;
+            color: #667eea;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-complete {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-complete:hover {
+            background-color: #218838;
+        }
+        .btn-cancel {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-cancel:hover {
+            background-color: #c82333;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <h1>Warehouse Management System</h1>
+            <div class="navbar-links">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'inventory_dashboard' %}" style="background-color: rgba(255, 255, 255, 0.2);">Inventory</a>
+                {% if user.is_superuser %}
+                <a href="{% url 'procurement_dashboard' %}">Procurement</a>
+                <a href="/admin/">Admin</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <span style="color: white; padding: 8px 16px;">{{ user.username }}</span>
+                <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>{{ page_title }}</h2>
+
+        <div class="detail-card">
+            <div class="section-title">Transfer Information</div>
+
+            <div class="info-row">
+                <div class="info-label">Transfer Number:</div>
+                <div class="info-value"><strong>{{ transfer.transfer_number }}</strong></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Status:</div>
+                <div class="info-value">
+                    {% if transfer.status == 'pending' %}
+                    <span class="status-badge status-pending">Pending</span>
+                    {% elif transfer.status == 'completed' %}
+                    <span class="status-badge status-completed">Completed</span>
+                    {% elif transfer.status == 'cancelled' %}
+                    <span class="status-badge status-cancelled">Cancelled</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Product:</div>
+                <div class="info-value">{{ transfer.product.name }} ({{ transfer.product.sku }})</div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Quantity:</div>
+                <div class="info-value"><strong>{{ transfer.quantity }}</strong></div>
+            </div>
+
+            <div class="section-title" style="margin-top: 30px;">Transfer Route</div>
+
+            <div class="transfer-flow">
+                <div class="location-box">
+                    <div class="location-code">{{ transfer.from_location.code }}</div>
+                    <div class="location-name">{{ transfer.from_location.name }}</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="location-box">
+                    <div class="location-code">{{ transfer.to_location.code }}</div>
+                    <div class="location-name">{{ transfer.to_location.name }}</div>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Requested By:</div>
+                <div class="info-value">{{ transfer.requested_by.username }}</div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Created:</div>
+                <div class="info-value">{{ transfer.created_at|date:"Y-m-d H:i" }}</div>
+            </div>
+
+            {% if transfer.transferred_by %}
+            <div class="info-row">
+                <div class="info-label">Completed By:</div>
+                <div class="info-value">{{ transfer.transferred_by.username }}</div>
+            </div>
+            {% endif %}
+
+            {% if transfer.transfer_date %}
+            <div class="info-row">
+                <div class="info-label">Transfer Date:</div>
+                <div class="info-value">{{ transfer.transfer_date|date:"Y-m-d H:i" }}</div>
+            </div>
+            {% endif %}
+
+            {% if transfer.notes %}
+            <div class="info-row">
+                <div class="info-label">Notes:</div>
+                <div class="info-value">{{ transfer.notes }}</div>
+            </div>
+            {% endif %}
+
+            {% if can_complete_transfer and transfer.status == 'pending' %}
+            <div class="button-group">
+                <a href="{% url 'transfer_complete' transfer.id %}" class="btn btn-complete">Complete Transfer</a>
+                <a href="{% url 'transfer_cancel' transfer.id %}" class="btn btn-cancel">Cancel Transfer</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <a href="{% url 'transfer_list' %}" class="back-link">&larr; Back to Transfer List</a>
+    </div>
+</body>
+</html>

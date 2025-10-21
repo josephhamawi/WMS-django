@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} - WMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .navbar-links {
+            display: flex;
+            gap: 20px;
+        }
+        .navbar-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .navbar-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .add-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .add-button:hover {
+            background-color: #218838;
+        }
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        thead th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        tbody td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .edit-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .edit-link:hover {
+            text-decoration: underline;
+        }
+        .delete-link {
+            color: #dc3545;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .delete-link:hover {
+            text-decoration: underline;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background-color: white;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <h1>Warehouse Management System</h1>
+            <div class="navbar-links">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'inventory_dashboard' %}">Inventory</a>
+                {% if user.is_superuser %}
+                <a href="{% url 'procurement_dashboard' %}" style="background-color: rgba(255, 255, 255, 0.2);">Procurement</a>
+                <a href="/admin/">Admin</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <span style="color: white; padding: 8px 16px;">{{ user.username }}</span>
+                <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>{{ page_title }}</h2>
+        <a href="{% url 'vendor_add' %}" class="add-button">+ Add New Vendor</a>
+
+        {% if vendors %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Contact Person</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Payment Terms</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vendor in vendors %}
+                    <tr>
+                        <td><strong>{{ vendor.code }}</strong></td>
+                        <td>{{ vendor.name }}</td>
+                        <td>{{ vendor.contact_person|default:"-" }}</td>
+                        <td>{{ vendor.email|default:"-" }}</td>
+                        <td>{{ vendor.phone|default:"-" }}</td>
+                        <td>{{ vendor.payment_terms|default:"-" }}</td>
+                        <td>
+                            {% if vendor.is_active %}
+                            <span class="status-badge status-active">Active</span>
+                            {% else %}
+                            <span class="status-badge status-inactive">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'vendor_update' vendor.id %}" class="edit-link">Edit</a>
+                            <a href="{% url 'vendor_delete' vendor.id %}" class="delete-link">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-message">
+            <h2>No vendors found</h2>
+            <p>Click "Add New Vendor" to get started.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

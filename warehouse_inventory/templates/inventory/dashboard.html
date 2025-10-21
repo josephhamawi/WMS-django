@@ -372,65 +372,57 @@
                     </div>
                 </div>
             </a>
-        </div>
 
-        <!-- Recent Requests Table -->
-        {% if recent_requests %}
-        <div class="section-title">Recent Item Requests</div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Request #</th>
-                        <th>Requested By</th>
-                        <th>Department</th>
-                        <th>Status</th>
-                        <th>Request Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for req in recent_requests %}
-                    <tr>
-                        <td><strong>{{ req.request_number }}</strong></td>
-                        <td>{{ req.requested_by.username }}</td>
-                        <td>{{ req.department.name|default:"-" }}</td>
-                        <td><span class="status-badge status-{{ req.status }}">{{ req.get_status_display }}</span></td>
-                        <td>{{ req.requested_date|date:"Y-m-d H:i" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
+            <a href="#" class="module-card">
+                <div class="module-header">
+                    <h2>Receiving</h2>
+                    <p>Receive items from purchase orders</p>
+                </div>
+                <div class="module-body">
+                    <div class="module-actions">
+                        <div class="module-action">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                            </svg>
+                            <span>View all receivings</span>
+                        </div>
+                        {% if can_manage_inventory %}
+                        <div class="module-action">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            <span>Create new receiving</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
 
-        <!-- Recent Issuances Table -->
-        {% if recent_issuances %}
-        <div class="section-title">Recent Issuances</div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Issue #</th>
-                        <th>Request #</th>
-                        <th>Issued By</th>
-                        <th>Issued To</th>
-                        <th>Issue Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for issuance in recent_issuances %}
-                    <tr>
-                        <td><strong>{{ issuance.issue_number }}</strong></td>
-                        <td>{{ issuance.item_request.request_number }}</td>
-                        <td>{{ issuance.issued_by.get_full_name|default:issuance.issued_by.username }}</td>
-                        <td>{{ issuance.issued_to.get_full_name|default:issuance.issued_to.username }}</td>
-                        <td>{{ issuance.issued_date|date:"Y-m-d H:i" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <a href="{% url 'transfer_list' %}" class="module-card">
+                <div class="module-header">
+                    <h2>Transfers</h2>
+                    <p>Transfer items between locations</p>
+                </div>
+                <div class="module-body">
+                    <div class="module-actions">
+                        <div class="module-action">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                            </svg>
+                            <span>View all transfers</span>
+                        </div>
+                        {% if can_manage_inventory %}
+                        <div class="module-action">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            <span>Create new transfer</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
         </div>
-        {% endif %}
     </div>
 </body>
 </html>

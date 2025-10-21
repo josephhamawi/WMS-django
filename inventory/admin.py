@@ -140,14 +140,14 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(PurchaseOrder)
 class PurchaseOrderAdmin(admin.ModelAdmin):
-    list_display = ['po_number', 'supplier_name', 'status', 'order_date', 'expected_delivery', 'total_amount', 'created_by']
+    list_display = ['po_number', 'external_po_number', 'supplier_name', 'status', 'order_date', 'expected_delivery', 'total_amount', 'created_by']
     list_filter = ['status', 'order_date', 'created_at']
-    search_fields = ['po_number', 'supplier_name']
+    search_fields = ['po_number', 'external_po_number', 'supplier_name']
     readonly_fields = ['created_at', 'updated_at', 'total_amount']
     inlines = [PurchaseOrderItemInline]
     fieldsets = (
         ('PO Information', {
-            'fields': ('po_number', 'supplier_name', 'supplier_contact', 'status')
+            'fields': ('po_number', 'external_po_number', 'supplier_name', 'supplier_contact', 'status')
         }),
         ('Dates', {
             'fields': ('order_date', 'expected_delivery')

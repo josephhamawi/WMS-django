@@ -371,64 +371,6 @@
                 </div>
             </a>
         </div>
-
-        <!-- Recent POs Table -->
-        {% if recent_pos %}
-        <div class="section-title">Recent Purchase Orders</div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>PO Number</th>
-                        <th>Vendor</th>
-                        <th>Status</th>
-                        <th>Order Date</th>
-                        <th>Total Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for po in recent_pos %}
-                    <tr>
-                        <td><strong>{{ po.po_number }}</strong></td>
-                        <td>{{ po.display_vendor }}</td>
-                        <td><span class="status-badge status-{{ po.status }}">{{ po.get_status_display }}</span></td>
-                        <td>{{ po.order_date|date:"Y-m-d" }}</td>
-                        <td>${{ po.total_amount|floatformat:2 }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-
-        <!-- Recent Quotations Table -->
-        {% if recent_quotations %}
-        <div class="section-title">Recent Quotations</div>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Quotation Number</th>
-                        <th>Vendor</th>
-                        <th>Status</th>
-                        <th>Request Date</th>
-                        <th>Total Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for quotation in recent_quotations %}
-                    <tr>
-                        <td><strong>{{ quotation.quotation_number }}</strong></td>
-                        <td>{{ quotation.vendor.name }}</td>
-                        <td><span class="status-badge status-{{ quotation.status }}">{{ quotation.get_status_display }}</span></td>
-                        <td>{{ quotation.request_date|date:"Y-m-d" }}</td>
-                        <td>{{ quotation.currency.symbol }}{{ quotation.total_amount|floatformat:2 }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
     </div>
 </body>
 </html>

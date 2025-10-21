@@ -101,6 +101,24 @@
             background-color: white;
             border-radius: 8px;
         }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .back-link {
+            display: inline-block;
+            padding: 10px 20px;
+            color: #667eea;
+            text-decoration: none;
+            border: 2px solid #667eea;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            background-color: #667eea;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -127,9 +145,13 @@
 
     <div class="container">
         <h2>Product Inventory</h2>
-        {% if can_manage_inventory %}
-        <a href="{% url 'add_inventory' %}" class="add-button">+ Add New Product</a>
-        {% endif %}
+
+        <div class="button-group">
+            {% if can_manage_inventory %}
+            <a href="{% url 'add_inventory' %}" class="add-button">+ Add New Product</a>
+            {% endif %}
+            <a href="{% url 'inventory_dashboard' %}" class="back-link">&larr; Back to Inventory Dashboard</a>
+        </div>
 
     {% if products %}
     <table>
